@@ -4,7 +4,6 @@ import { Mail, Lock, Eye } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import API from "../api/axios";
 import { useGoogleLogin } from '@react-oauth/google';
-import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
 
 export default function Login() {
   const [email, setEmail] = useState("");
