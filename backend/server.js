@@ -3,6 +3,8 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
@@ -132,15 +134,119 @@ app.get('/api/doctors/:id', (req, res) => {
 });
 
 // ── Appointment routes ───────────────────────────────────────────────
-app.get('/api/appointments', (_req, res) => res.json({ appointments }));
+app.get('/api/appointments', (_req, res) => {
+  // Enrich each appointment with full doctor object for the Dashboard
+  const enriched = appointments.map(appt => ({
+    ...appt,
+    doctor: DOCTORS.find(d => d._id === appt.doctorId) || null,
+  }));
+  res.json({ appointments: enriched });
+});
 app.post('/api/appointments', (req, res) => {
-  const appt = { _id: randomUUID(), ...req.body, createdAt: new Date() };
+  const { doctorId, date, time } = req.body;
+  const doctor = DOCTORS.find(d => d._id === doctorId) || null;
+  const appt = {
+    _id: randomUUID(),
+    doctorId,
+    date,
+    time,
+    doctor,
+    status: 'pending',
+    createdAt: new Date(),
+  };
   appointments.push(appt);
   res.status(201).json({ appointment: appt });
 });
 
+// ── AI Symptom Checker ───────────────────────────────────────────────
+const DEPARTMENT_RULES = [
+  { keywords: ['chest pain','chest','heart','palpitation','shortness of breath','breathing'], department: 'Cardiology', category: 'Cardiologist', urgency: 'High' },
+  { keywords: ['headache','migraine','seizure','memory','confusion','numbness','dizziness'], department: 'Neurology', category: 'Neurologist', urgency: 'Medium' },
+  { keywords: ['anxiety','depression','stress','mental','panic','mood','insomnia','sleep'], department: 'Psychiatry', category: 'Psychiatrist', urgency: 'Medium' },
+  { keywords: ['rash','skin','acne','eczema','itching','psoriasis','hair loss'], department: 'Dermatology', category: 'Dermatologist', urgency: 'Low' },
+  { keywords: ['bone','joint','knee','back pain','spine','fracture','arthritis','muscle'], department: 'Orthopedics', category: 'Orthopedic Surgeon', urgency: 'Medium' },
+  { keywords: ['child','baby','infant','fever in child','pediatric','toddler'], department: 'Pediatrics', category: 'Pediatrician', urgency: 'Medium' },
+  { keywords: ['cough','cold','flu','throat','sore throat','runny nose','congestion','fever'], department: 'General Medicine', category: 'General Physician', urgency: 'Low' },
+  { keywords: ['stomach','nausea','vomiting','diarrhea','constipation','abdomen','gastric'], department: 'Gastroenterology', category: 'Gastroenterologist', urgency: 'Medium' },
+  { keywords: ['eye','vision','blur','redness in eye'], department: 'Ophthalmology', category: 'Ophthalmologist', urgency: 'Medium' },
+  { keywords: ['ear','hearing','tinnitus','ear pain'], department: 'ENT', category: 'ENT Specialist', urgency: 'Low' },
+];
+
+const fallbackSymptomAnalysis = (symptoms) => {
+  const lower = symptoms.toLowerCase();
+  for (const rule of DEPARTMENT_RULES) {
+    if (rule.keywords.some(k => lower.includes(k))) {
+      return {
+        department: rule.department,
+        doctorCategory: rule.category,
+        urgencyLevel: rule.urgency,
+        reasoning: `Based on your symptoms, we recommend consulting a ${rule.category} in the ${rule.department} department.`,
+        disclaimer: 'This is an AI-generated suggestion for informational purposes only. Please consult a doctor for professional medical advice.'
+      };
+    }
+  }
+  return {
+    department: 'General Medicine',
+    doctorCategory: 'General Physician',
+    urgencyLevel: 'Low',
+    reasoning: 'Your symptoms suggest a general health concern. A General Physician can help assess and refer you appropriately.',
+    disclaimer: 'This is an AI-generated suggestion for informational purposes only. Please consult a doctor for professional medical advice.'
+  };
+};
+
+app.post('/api/ai/symptom-check', async (req, res) => {
+  const { symptoms } = req.body;
+  if (!symptoms || symptoms.trim().length < 3) {
+    return res.status(400).json({ message: 'Please describe your symptoms in more detail.' });
+  }
+
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+  if (!GEMINI_API_KEY) {
+    // Fallback to rule-based engine
+    return res.json(fallbackSymptomAnalysis(symptoms));
+  }
+
+  try {
+    const prompt = `You are a medical triage assistant. A patient describes these symptoms: "${symptoms}"
+
+Respond ONLY with a JSON object (no markdown, no code fences) with these exact keys:
+- department: (e.g., Cardiology, Neurology, General Medicine)
+- doctorCategory: (e.g., Cardiologist, General Physician)
+- urgencyLevel: (exactly one of: "High", "Medium", or "Low")
+- reasoning: (1-2 sentences explaining the recommendation)
+- disclaimer: "This is an AI-generated suggestion for informational purposes only. Please consult a doctor for professional medical advice."
+
+Return only valid JSON.`;
+
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.2, maxOutputTokens: 512 }
+        })
+      }
+    );
+
+    if (!geminiRes.ok) throw new Error('Gemini API error');
+    const geminiData = await geminiRes.json();
+    const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // Strip markdown code fences if present
+    const cleaned = rawText.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+    return res.json(parsed);
+  } catch (err) {
+    console.error('Gemini Error, using fallback:', err.message);
+    return res.json(fallbackSymptomAnalysis(symptoms));
+  }
+});
+
 // ── Health check ─────────────────────────────────────────────────────
-app.get('/api', (_req, res) => res.json({ status: 'Clinico API running ✓' }));
+app.get('/api', (_req, res) => res.json({ status: 'Clinico API running ✓ | AI-Enabled' }));
 
 // Only start HTTP server in non-serverless environment
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {

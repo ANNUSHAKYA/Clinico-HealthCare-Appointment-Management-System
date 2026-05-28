@@ -18,6 +18,9 @@ export default function Navbar() {
         <div className="nav-links">
           <Link to="/" className={isActive("/")}>Home</Link>
           <Link to="/doctors" className={isActive("/doctors")}>Doctors</Link>
+          <Link to="/symptom-checker" className={`nav-ai-link ${isActive("/symptom-checker")}`}>
+            ✨ AI Symptom Checker
+          </Link>
           <Link to="/about" className={isActive("/about")}>About</Link>
           <Link to="/contact" className={isActive("/contact")}>Contact</Link>
         </div>

@@ -89,6 +89,33 @@ export default function Home() {
         </div>
       </section>
 
+      {/* AI Symptom Checker Promo Section */}
+      <section className="ai-promo-section">
+        <div className="container ai-promo-content">
+          <div className="ai-promo-badge">
+            <span>🤖</span> Powered by Gemini AI
+          </div>
+          <h2>Not sure which doctor to see?</h2>
+          <p>
+            Describe your symptoms and our AI will instantly recommend the right
+            department, doctor category, and urgency level — for free.
+          </p>
+          <div className="ai-promo-example">
+            <div className="ai-promo-bubble ai-promo-user">
+              💬 &nbsp;"I have chest pain and shortness of breath"
+            </div>
+            <div className="ai-promo-bubble ai-promo-result">
+              🏥 &nbsp;<strong>Cardiology</strong> &nbsp;·&nbsp; 
+              👨‍⚕️ &nbsp;<strong>Cardiologist</strong> &nbsp;·&nbsp;
+              🔴 &nbsp;<strong>High Priority</strong>
+            </div>
+          </div>
+          <Link to="/symptom-checker" className="btn btn-ai-promo">
+            ✨ Try AI Symptom Checker &nbsp;<ArrowRight size={18} />
+          </Link>
+        </div>
+      </section>
+
       {/* Doctors Section */}
       <section className="doctors-section">
         <div className="container">

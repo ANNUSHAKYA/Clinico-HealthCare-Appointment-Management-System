@@ -11,6 +11,7 @@ import BookAppointment from "./pages/BookAppointment";
 import About           from "./pages/About";
 import Contact         from "./pages/Contact";
 import Admin           from "./pages/Admin";
+import SymptomChecker  from "./pages/SymptomChecker";
 
 const Spinner = () => (
   <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh" }}>
@@ -35,16 +36,17 @@ function Layout() {
     <>
       <Navbar />
       <Routes>
-        <Route path="/"          element={<Home />} />
-        <Route path="/doctors"   element={<Doctors />} />
-        <Route path="/about"     element={<About />} />
-        <Route path="/contact"   element={<Contact />} />
-        <Route path="/admin"     element={<Public><Admin /></Public>} />
-        <Route path="/login"     element={<Public><Login /></Public>} />
-        <Route path="/register"  element={<Public><Register /></Public>} />
-        <Route path="/dashboard" element={<Private><Dashboard /></Private>} />
-        <Route path="/book/:id"  element={<Private><BookAppointment /></Private>} />
-        <Route path="*"          element={<Navigate to="/" replace />} />
+        <Route path="/"                element={<Home />} />
+        <Route path="/doctors"         element={<Doctors />} />
+        <Route path="/about"           element={<About />} />
+        <Route path="/contact"         element={<Contact />} />
+        <Route path="/symptom-checker" element={<SymptomChecker />} />
+        <Route path="/admin"           element={<Public><Admin /></Public>} />
+        <Route path="/login"           element={<Public><Login /></Public>} />
+        <Route path="/register"        element={<Public><Register /></Public>} />
+        <Route path="/dashboard"       element={<Private><Dashboard /></Private>} />
+        <Route path="/book/:id"        element={<Private><BookAppointment /></Private>} />
+        <Route path="*"                element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />
     </>
