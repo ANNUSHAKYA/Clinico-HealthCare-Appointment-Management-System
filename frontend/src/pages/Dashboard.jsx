@@ -51,47 +51,70 @@ export default function Dashboard() {
                 return (
                   <div
                     key={apt._id}
+                    className="appointment-card"
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      padding: "20px",
+                      padding: "24px",
                       border: "1px solid var(--border)",
-                      borderRadius: "var(--radius)",
-                      background: "#fafafa",
+                      borderRadius: "16px",
+                      background: "white",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
+                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                      cursor: "default"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow = "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)";
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                      {apt.doctor?.image && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+                      {apt.doctor?.image ? (
                         <img
                           src={apt.doctor.image}
                           alt={doctorName}
-                          style={{ width: "52px", height: "52px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+                          style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "2px solid var(--green-light)" }}
                         />
+                      ) : (
+                        <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: "var(--green-light)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--green-dark)", fontWeight: "bold", fontSize: "1.2rem" }}>
+                          {doctorName.charAt(0)}
+                        </div>
                       )}
                       <div>
-                        <h3 style={{ fontSize: "1.05rem", marginBottom: "3px" }}>Dr. {doctorName}</h3>
+                        <h3 style={{ fontSize: "1.15rem", marginBottom: "4px", color: "var(--text)" }}>Dr. {doctorName}</h3>
                         {specialty && (
-                          <p style={{ color: "var(--green)", fontSize: "0.85rem", fontWeight: 500, marginBottom: "3px" }}>
+                          <p style={{ color: "var(--green-dark)", fontSize: "0.9rem", fontWeight: 600, marginBottom: "6px" }}>
                             {specialty}
                           </p>
                         )}
-                        <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
-                          📅 {apt.date ? new Date(apt.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—"}&nbsp;&nbsp;
-                          🕐 {apt.time || "—"}
-                        </p>
+                        <div style={{ display: "flex", gap: "12px", color: "var(--text-muted)", fontSize: "0.85rem" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            {apt.date ? new Date(apt.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—"}
+                          </span>
+                          <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            {apt.time || "—"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <span
                       style={{
-                        padding: "5px 14px",
-                        borderRadius: "20px",
-                        fontSize: "0.82rem",
+                        padding: "6px 16px",
+                        borderRadius: "24px",
+                        fontSize: "0.85rem",
                         fontWeight: 600,
                         textTransform: "capitalize",
                         background: statusColor.bg,
                         color: statusColor.text,
                         flexShrink: 0,
+                        border: `1px solid ${statusColor.text}40`
                       }}
                     >
                       {status}
