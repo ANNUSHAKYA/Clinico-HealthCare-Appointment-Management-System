@@ -968,3 +968,122 @@ input, select, textarea { font-family: inherit; outline: none; }
   animation: fadeInUp 0.5s ease both;
 }
 
+/* ── Mobile Responsiveness ──────────────────────────────────────── */
+
+/* Small Devices (Tablets and Phones) */
+@media (max-width: 900px) {
+  /* Hero Section */
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 30px;
+  }
+  .hero-text p {
+    margin: 0 auto 30px auto;
+  }
+  .hero-buttons {
+    justify-content: center;
+  }
+
+  /* Footer */
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+}
+
+/* Extra Small Devices (Phones) */
+@media (max-width: 600px) {
+  /* Global */
+  .container {
+    padding: 0 16px;
+  }
+  
+  /* Navbar */
+  .nav-container {
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px 0;
+  }
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  /* Hero Section */
+  .hero {
+    padding: 50px 0;
+  }
+  .hero-text h1 {
+    font-size: 2.2rem;
+  }
+  .hero-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  /* Features */
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Doctors Grid */
+  .doctors-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* CTA */
+  .cta-section h2 {
+    font-size: 1.8rem;
+  }
+  
+  /* Footer */
+  .footer-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .footer-logo {
+    justify-content: center;
+  }
+  .footer-contact {
+    align-items: center;
+  }
+  
+  /* Auth Forms */
+  .form-container {
+    margin: 30px auto;
+    padding: 20px;
+  }
+
+  /* AI Symptom Checker */
+  .sc-hero {
+    padding: 40px 16px 50px;
+  }
+  .sc-hero-title {
+    font-size: 2rem;
+  }
+  .sc-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  /* AI Promo Section on Home */
+  .ai-promo-content h2 {
+    font-size: 1.8rem;
+  }
+  .ai-promo-section {
+    padding: 50px 16px;
+  }
+  
+  /* Dashboard Cards */
+  .appointment-card {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 15px;
+  }
+  .appointment-card > span {
+    align-self: flex-start;
+  }
+}
+
